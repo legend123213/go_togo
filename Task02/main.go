@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"strings"
 	"os"
+	"strings"
 )
 func WordFrequency(s string) map[string]int{
  str:=strings.ToLower(strings.TrimSpace(s))
@@ -17,7 +17,7 @@ func WordFrequency(s string) map[string]int{
 }
 
 func Palindrom(s string) bool{
-str := strings.ToUpper(s)
+str := strings.ToUpper(strings.TrimSpace(s))
 i := 0
 j := len(s)-1
 print(str[i])
