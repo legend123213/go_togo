@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"strings"
+	"os"
 )
 func WordFrequency(s string) map[string]int{
  str:=s
@@ -36,9 +38,16 @@ for i<=j {
 }
 return true
 }
-
+func getInput(r *bufio.Reader) (string,error){
+	input,err := r.ReadString('\n')
+	return input,err
+}
 func main(){
-	fmt.Println(WordFrequency("abel wendmu"))
-	fmt.Println(Palindrom("abe ba"))
-
+	reader := bufio.NewReader(os.Stdin)
+	str,err := getInput(reader)
+	if err != nil{
+		panic("wronge input")
+	}
+	fmt.Println(WordFrequency(str))
+	fmt.Println(Palindrom(str))
 }
