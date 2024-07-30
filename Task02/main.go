@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 func WordFrequency(s string) map[string]int{
  str:=s
@@ -13,19 +14,31 @@ func WordFrequency(s string) map[string]int{
 }
 
 func Palindrom(s string) bool{
-str := s
+str := strings.ToUpper(s)
 i := 0
 j := len(s)-1
-for i<j {
+print(str[i])
+for i<=j {
+	if str[i]<65 || str[i]>90{
+		i++
+		continue
+	}
+	if str[j]<65 || str[j]>90{
+		j--
+		continue
+	}
+	fmt.Println(i,j)
 	if str[i]!= str[j]{
 		return false
 	}
+	i++
+	j--
 }
 return true
 }
 
 func main(){
 	fmt.Println(WordFrequency("abel wendmu"))
-	fmt.Println(Palindrom("abel wendmu"))
+	fmt.Println(Palindrom("abe ba"))
 
 }
