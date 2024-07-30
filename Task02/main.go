@@ -7,9 +7,10 @@ import (
 	"os"
 )
 func WordFrequency(s string) map[string]int{
- str:=s
+ str:=strings.ToLower(strings.TrimSpace(s))
+ arrWord:=strings.Split(str," ")
  count := make(map[string]int)
- for _, ch := range str {
+ for _, ch := range arrWord {
 	count[string(ch)]+=1
  }
  return count
