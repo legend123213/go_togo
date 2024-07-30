@@ -20,7 +20,7 @@ func getInput(r *bufio.Reader, s string) (string, error) {
 func getSubjects() map[string]float64 {
 	input := bufio.NewReader(os.Stdin)
 	numberSubjects,err := getInput(input,"How many Subjects did you take?")
-	numberSubject,err_ := strconv.Atoi(numberSubjects[:len(numberSubjects)-1])
+	numberSubject,err_ := strconv.Atoi(strings.TrimSpace(numberSubjects))
 	if err!=nil || err_ != nil{
 		panic("Please Enter Number try again")
 	}
