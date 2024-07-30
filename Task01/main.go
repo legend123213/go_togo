@@ -65,7 +65,7 @@ func main() {
 	result := fmt.Sprintf("NAME: %s\nScores \n%s\n", name, subjectsDetails)
 	fmt.Println(result)
 	fmt.Println("----------------------------------------------------------------")
-	fmt.Println("Average Score:%.2f",average)
+	fmt.Printf("Average Score: %.2f\n", average)
 	fmt.Println("----------------------------------------------------------------")
 	
 }
