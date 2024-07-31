@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/legend123213/go_togo/Task04/data"
@@ -18,7 +19,6 @@ type inputTask struct{
 
 func AddBook(c *gin.Context,storage *data.Storage) {
 	var task inputTask
-	
 	if err := c.BindJSON(&task); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data","erro":err})
 			return
@@ -41,4 +41,21 @@ func GetTasks(c *gin.Context,storage *data.Storage){
 	fmt.Println(task)
 	log.Println("hello",task)
 	c.JSON(http.StatusOK, task)
+}
+func GetTask(c *gin.Context,storage *data.Storage){
+	Id:=c.Param("id")
+	id,err:=strconv.Atoi(Id)
+	task,exist:= storage.GetTask(id)
+	if err!=nil{
+		c.JSON(http.StatusNotFound,gin.H{"message":"wrong id"})
+		
+	}else if !exist{
+		c.JSON(http.StatusBadRequest,gin.H{"message":"task not found"})
+	}else{
+c.JSON(http.StatusOK,task)
+	}
+	
+
+	
+
 }
