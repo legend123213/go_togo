@@ -80,6 +80,20 @@ func EditTask(c *gin.Context,storage *data.Storage){
 	}
 
 }
+func DeleteTask(c *gin.Context,storage *data.Storage){
+	Id:=c.Param("id")
+	id,err:=strconv.Atoi(Id)
+	exist:= storage.DeleteTask(id)
+	if err!=nil{
+		c.JSON(http.StatusNotFound,gin.H{"message":"wrong id"})
+		
+	}else if !exist{
+		c.JSON(http.StatusBadRequest,gin.H{"message":"task not found"})
+	}else{
+c.JSON(http.StatusNoContent,gin.H{"message":"Successfully Deleted"})
+	}
+
+}
 
 
 	
