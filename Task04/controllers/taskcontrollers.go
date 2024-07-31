@@ -29,9 +29,9 @@ func AddBook(c *gin.Context,storage *data.Storage) {
 			Due_date: task.Due_date,
 			Status: task.Status,
 		}
-	storage.AddTasks(t)
+	
 	log.Println(t,storage)
-	c.JSON(http.StatusCreated,gin.H{"message":"Succuss"})
+	c.JSON(http.StatusCreated,storage.AddTasks(t))
 	}
 
 
@@ -54,8 +54,33 @@ func GetTask(c *gin.Context,storage *data.Storage){
 	}else{
 c.JSON(http.StatusOK,task)
 	}
-	
-
-	
+}
+func EditTask(c *gin.Context,storage *data.Storage){
+	Id:=c.Param("id")
+	id,err:=strconv.Atoi(Id)
+	var task inputTask
+	if err := c.BindJSON(&task); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data","erro":err})
+			return
+		}
+	t := models.Task{
+			Title: task.Title,
+			Description: task.Description,
+			Due_date: task.Due_date,
+			Status: task.Status,
+		}
+	editedTask,exist:= storage.EditTasks(id,t)
+	if err!=nil{
+		c.JSON(http.StatusNotFound,gin.H{"message":"wrong id"})
+		
+	}else if !exist{
+		c.JSON(http.StatusBadRequest,gin.H{"message":"task not found"})
+	}else{
+	c.JSON(http.StatusOK,editedTask)
+	}
 
 }
+	
+
+	
+
