@@ -49,3 +49,10 @@ func (ta *Storage) EditTasks(id int,t models.Task) (models.Task,bool) {
 	}
 return ta.tasks[id],exist
 }
+func (ta *Storage) DeleteTask(id int) bool{
+	_,exist:=ta.tasks[id]
+	if exist{
+		delete(ta.tasks,id)
+	}
+	return exist
+}
