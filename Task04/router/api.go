@@ -21,5 +21,8 @@ func Api() *gin.Engine{
 	api.GET("api/task/:id",func(c *gin.Context){
 		controllers.GetTask(c,storage)
 	})
+	api.PUT("api/task/:id",func(c *gin.Context){
+		controllers.EditTask(c,storage)
+	})
 	return api
 }
