@@ -18,5 +18,8 @@ func Api() *gin.Engine{
 	api.POST("api/task",func(c *gin.Context){
 		controllers.AddBook(c,storage)
 	})
+	api.GET("api/task/:id",func(c *gin.Context){
+		controllers.GetTask(c,storage)
+	})
 	return api
 }
