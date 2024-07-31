@@ -24,5 +24,8 @@ func Api() *gin.Engine{
 	api.PUT("api/task/:id",func(c *gin.Context){
 		controllers.EditTask(c,storage)
 	})
+	api.DELETE("api/task/:id",func(c *gin.Context){
+		controllers.DeleteTask(c,storage)
+	})
 	return api
 }
