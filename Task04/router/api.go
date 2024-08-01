@@ -12,19 +12,19 @@ func Api() *gin.Engine{
 	api:= gin.New()
 	
 	api.Use(gin.Recovery())
-	api.GET("api/task", func(c *gin.Context) {
+	api.GET("api/v1/task", func(c *gin.Context) {
 		controllers.GetTasks(c,storage)
 	})
-	api.POST("api/task",func(c *gin.Context){
+	api.POST("api/v1/task",func(c *gin.Context){
 		controllers.AddBook(c,storage)
 	})
-	api.GET("api/task/:id",func(c *gin.Context){
+	api.GET("api/v1/task/:id",func(c *gin.Context){
 		controllers.GetTask(c,storage)
 	})
-	api.PUT("api/task/:id",func(c *gin.Context){
+	api.PUT("api/v1/task/:id",func(c *gin.Context){
 		controllers.EditTask(c,storage)
 	})
-	api.DELETE("api/task/:id",func(c *gin.Context){
+	api.DELETE("api/v1/task/:id",func(c *gin.Context){
 		controllers.DeleteTask(c,storage)
 	})
 	return api
