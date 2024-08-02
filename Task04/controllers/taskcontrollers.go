@@ -17,7 +17,7 @@ type inputTask struct{
 	Status string `json:"Status" binding:"required"`
 }
 
-func AddBook(c *gin.Context,storage *data.Storage) {
+func AddBook(c *gin.Context,storage data.TaskManager) {
 	var task inputTask
 	if err := c.BindJSON(&task); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data","erro":err})
@@ -36,13 +36,13 @@ func AddBook(c *gin.Context,storage *data.Storage) {
 
 
 
-func GetTasks(c *gin.Context,storage *data.Storage){
+func GetTasks(c *gin.Context,storage data.TaskManager){
 	task:= storage.GetTasks()
 	fmt.Println(task)
 	log.Println("hello",task)
 	c.JSON(http.StatusOK, task)
 }
-func GetTask(c *gin.Context,storage *data.Storage){
+func GetTask(c *gin.Context,storage data.TaskManager){
 	Id:=c.Param("id")
 	id,err:=strconv.Atoi(Id)
 	task,exist:= storage.GetTask(id)
@@ -55,7 +55,7 @@ func GetTask(c *gin.Context,storage *data.Storage){
 c.JSON(http.StatusOK,task)
 	}
 }
-func EditTask(c *gin.Context,storage *data.Storage){
+func EditTask(c *gin.Context,storage data.TaskManager){
 	Id:=c.Param("id")
 	id,err:=strconv.Atoi(Id)
 	var task inputTask
@@ -80,7 +80,7 @@ func EditTask(c *gin.Context,storage *data.Storage){
 	}
 
 }
-func DeleteTask(c *gin.Context,storage *data.Storage){
+func DeleteTask(c *gin.Context,storage data.TaskManager){
 	Id:=c.Param("id")
 	id,err:=strconv.Atoi(Id)
 	exist:= storage.DeleteTask(id)

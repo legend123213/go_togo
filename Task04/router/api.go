@@ -7,7 +7,7 @@ import (
 )
 
 func Api() *gin.Engine{
-	var storage = data.DbRun()
+	var storage data.TaskManager = data.DbRun()
 	// gin.SetMode(gin.ReleaseMode)
 	api:= gin.New()
 	

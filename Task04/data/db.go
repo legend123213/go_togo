@@ -12,9 +12,9 @@ type Storage struct{
 type TaskManager interface{
 	AddTasks(task models.Task) models.Task
 	GetTasks() []models.Task
-	EditTask(id int,task models.Task) (models.Task,bool)
+	EditTasks(id int,task models.Task) (models.Task,bool)
 	GetTask(id int) (models.Task,bool)
-	DeleteTask(id int)
+	DeleteTask(id int) bool
 }
 
 func DbRun() *Storage{
