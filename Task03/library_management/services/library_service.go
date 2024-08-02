@@ -7,7 +7,7 @@ import (
 
 type Library_Manager interface {
 	AddBook(book models.Book)
-	RemoveBook(bookID int)
+	RemoveBook(bookID int) error
 	BorrowedBooks(bookID int, memberID int) error
 	ReturnBook(bookID int, memberID int) error
 	ListAvailableBooks() []models.Book
@@ -44,16 +44,14 @@ func (lib *Library) RemoveBook(id int) error{
 // BorrowedBooks borrows a book from the library
 func (lib *Library) BorrowedBooks(bookID int, memberID int) error {
 	book, err := lib.Books[bookID]
-	member, exist := lib.Members[memberID]
+	member := lib.Members[memberID]
 	if !err {
 		return errors.New("book is not found")
 	}
 	if book.Status == "Borrowed" {
 		return errors.New("book is unavailable")
 	}
-	if !exist {
-		return errors.New("user not found")
-	}
+	
 	book.Status = "Borrowed"
 	member.BorrowedBooks = append(member.BorrowedBooks, book)
 	lib.Books[bookID] = book

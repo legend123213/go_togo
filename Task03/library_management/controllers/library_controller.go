@@ -25,16 +25,9 @@ func getInputInt(s string) (int,error){
 }
 
 func LibraryController(){
- lib := services.NewLibrary()
- memberID,err_id := getInputInt("Enter your id: ")
- nameMember,err_title := getInputStr("Enter Your Name: ")
- if err_id != nil || err_title != nil {
-	panic("Please Enter Vaild Input")
- }
- var member models.Member
- member.ID = memberID
- member.Name = nameMember
- lib.Members[memberID] = member
+ var lib services.Library_Manager = services.NewLibrary()
+ 
+ 
 
  for{
 		fmt.Println("\n=== Library Management System ===")
