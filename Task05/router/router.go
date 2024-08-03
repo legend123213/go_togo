@@ -19,6 +19,9 @@ func Api(storage *mongo.Database) *gin.Engine{
 	api.GET("api/v1/tasks",func(c *gin.Context){
 		controllers.GetTasks(c,storage)
 	})
+	api.DELETE("api/v1/task/:id",func(c *gin.Context){
+		controllers.DeleteTask(c,storage)
+	})
 	
 	
   return api
