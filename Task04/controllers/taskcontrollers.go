@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/legend123213/go_togo/Task04/models"
 )
 type inputTask struct{
+	
 	Title string `json:"Title" binding:"required"`
 	Description string `json:"Description" binding:"required"`
 	Due_date string `json:"Due_date" binding:"required"`
@@ -30,7 +30,6 @@ func AddBook(c *gin.Context,storage data.TaskManager) {
 			Status: task.Status,
 		}
 	
-	log.Println(t,storage)
 	c.JSON(http.StatusCreated,storage.AddTasks(t))
 	}
 
@@ -39,7 +38,6 @@ func AddBook(c *gin.Context,storage data.TaskManager) {
 func GetTasks(c *gin.Context,storage data.TaskManager){
 	task:= storage.GetTasks()
 	fmt.Println(task)
-	log.Println("hello",task)
 	c.JSON(http.StatusOK, task)
 }
 func GetTask(c *gin.Context,storage data.TaskManager){
