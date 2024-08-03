@@ -40,3 +40,13 @@ func GetTasks(c *gin.Context,storage *mongo.Database){
 	log.Println(err)
 	c.JSON(200,data)
 }
+func DeleteTask(c *gin.Context,storage *mongo.Database){
+	id := c.Param("id")
+	err:= data.DeleteTask(id,storage)
+	if err != nil{
+		c.JSON(http.StatusBadRequest,err)
+		return
+	}
+	c.JSON(http.StatusNoContent,gin.H{"message":"Successfully Deleted"})
+
+}
