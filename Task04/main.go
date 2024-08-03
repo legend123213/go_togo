@@ -12,7 +12,7 @@ func main(){
 	fmt.Println("")
 	err :=root.Run(":8000")
 	if err!=nil {
-		fmt.Println("errror")
+		fmt.Println("error")
 	}else{
 		fmt.Println("work fine")
 	}
