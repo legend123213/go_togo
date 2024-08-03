@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,4 +34,9 @@ func GetTask(c *gin.Context,storage *mongo.Database){
 	}
 	c.JSON(http.StatusOK,data)
 
+}
+func GetTasks(c *gin.Context,storage *mongo.Database){
+	data,err := data.GetTasks(storage)
+	log.Println(err)
+	c.JSON(200,data)
 }

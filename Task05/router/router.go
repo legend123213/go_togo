@@ -16,6 +16,9 @@ func Api(storage *mongo.Database) *gin.Engine{
 	api.GET("api/v1/task/:id",func(c *gin.Context){
 		controllers.GetTask(c,storage)
 	})
+	api.GET("api/v1/tasks",func(c *gin.Context){
+		controllers.GetTasks(c,storage)
+	})
 	
 	
   return api
