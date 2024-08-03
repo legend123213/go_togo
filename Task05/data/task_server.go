@@ -59,3 +59,19 @@ func DeleteTask(id string, s *mongo.Database) error {
 	_,err:=s.Collection("Tasks").DeleteOne(context.TODO(),bson.M{"_id":ID})
 	return err
 }
+func EditTask(id string,s *mongo.Database,t *models.Task)(*models.Task,error){
+	ID,_ := primitive.ObjectIDFromHex(id)
+	update:=bson.M{
+		"$set":bson.M{
+			"title":t.Title,
+			"description":t.Description,
+			"due_date":t.Due_date,
+			"status":t.Status,
+		},
+	}
+	data,err := s.Collection("Tasks").UpdateOne(context.TODO(),bson.M{"_id":ID},update)
+	t.ID = ID
+	log.Println(err,data)
+	return t,err
+
+}
