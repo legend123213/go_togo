@@ -54,3 +54,8 @@ func GetTasks(s *mongo.Database)([]models.Task,error){
 	log.Println(tasks)
 	return tasks,err
 }
+func DeleteTask(id string, s *mongo.Database) error {
+	ID,_:=primitive.ObjectIDFromHex(id)
+	_,err:=s.Collection("Tasks").DeleteOne(context.TODO(),bson.M{"_id":ID})
+	return err
+}
