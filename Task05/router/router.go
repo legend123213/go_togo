@@ -22,6 +22,9 @@ func Api(storage *mongo.Database) *gin.Engine{
 	api.DELETE("api/v1/task/:id",func(c *gin.Context){
 		controllers.DeleteTask(c,storage)
 	})
+	api.PUT("api/v1/task/:id",func(c *gin.Context){
+		controllers.EditTask(c,storage)
+	})
 	
 	
   return api
