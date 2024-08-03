@@ -40,5 +40,17 @@ func GetTask(id string,s *mongo.Database) (*models.Task,error){
 	err := s.Collection("Tasks").FindOne(context.TODO(),bson.M{"_id": ID}).Decode(&task)
 	log.Println(err)
 	return &task,err
-
+}
+func GetTasks(s *mongo.Database)([]models.Task,error){
+	var tasks []models.Task
+	iterDocument,err := s.Collection("Tasks").Find(context.TODO(),bson.D{})
+	for iterDocument.Next(context.TODO()){
+		var task models.Task
+		if err:= iterDocument.Decode(&task); err !=nil {
+			return tasks,err
+		}
+		tasks = append(tasks, task)
+	}
+	log.Println(tasks)
+	return tasks,err
 }
