@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"log"
 
 	"github.com/legend123213/go_togo/Task05/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,68 +9,65 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-
-
-
-type Tasks interface{
-	AddTask(task models.Task) (models.Task,error)
-	EditTask(task models.Task,id int) (models.Task,error)
-	GetTask(id int) (models.Task,error)
-	GetTasks() ([]models.Task,error)
+// Tasks is an interface that defines the operations for managing tasks.
+type Tasks interface {
+	AddTask(task models.Task) (models.Task, error)
+	EditTask(task models.Task, id int) (models.Task, error)
+	GetTask(id int) (models.Task, error)
+	GetTasks() ([]models.Task, error)
 	DeleteTask(id int) error
 }
 
-
-
-
-
-func AddTask(task *models.Task,s *mongo.Database) (*models.Task,error){
+// AddTask adds a new task to the database.
+func AddTask(task *models.Task, s *mongo.Database) (*models.Task, error) {
 	store := s.Collection("Tasks")
-	data,err:=store.InsertOne(context.TODO(),*task)
-	id:=data.InsertedID.(primitive.ObjectID)
-	task.ID=id
-	return task,err
+	data, err := store.InsertOne(context.TODO(), *task)
+	id := data.InsertedID.(primitive.ObjectID)
+	task.ID = id
+	return task, err
 }
 
-func GetTask(id string,s *mongo.Database) (*models.Task,error){
+// GetTask retrieves a task from the database based on the given ID.
+func GetTask(id string, s *mongo.Database) (*models.Task, error) {
 	var task models.Task
-	ID,_ := primitive.ObjectIDFromHex(id)
-	log.Println(ID)
-	err := s.Collection("Tasks").FindOne(context.TODO(),bson.M{"_id": ID}).Decode(&task)
-	log.Println(err)
-	return &task,err
+	ID, _ := primitive.ObjectIDFromHex(id)
+	err := s.Collection("Tasks").FindOne(context.TODO(), bson.M{"_id": ID}).Decode(&task)
+	return &task, err
 }
-func GetTasks(s *mongo.Database)([]models.Task,error){
+
+// GetTasks retrieves all tasks from the database.
+func GetTasks(s *mongo.Database) ([]models.Task, error) {
 	var tasks []models.Task
-	iterDocument,err := s.Collection("Tasks").Find(context.TODO(),bson.D{})
-	for iterDocument.Next(context.TODO()){
+	iterDocument, err := s.Collection("Tasks").Find(context.TODO(), bson.D{})
+	for iterDocument.Next(context.TODO()) {
 		var task models.Task
-		if err:= iterDocument.Decode(&task); err !=nil {
-			return tasks,err
+		if err := iterDocument.Decode(&task); err != nil {
+			return tasks, err
 		}
 		tasks = append(tasks, task)
 	}
-	log.Println(tasks)
-	return tasks,err
+	return tasks, err
 }
+
+// DeleteTask deletes a task from the database based on the given ID.
 func DeleteTask(id string, s *mongo.Database) error {
-	ID,_:=primitive.ObjectIDFromHex(id)
-	_,err:=s.Collection("Tasks").DeleteOne(context.TODO(),bson.M{"_id":ID})
+	ID, _ := primitive.ObjectIDFromHex(id)
+	_, err := s.Collection("Tasks").DeleteOne(context.TODO(), bson.M{"_id": ID})
 	return err
 }
-func EditTask(id string,s *mongo.Database,t *models.Task)(*models.Task,error){
-	ID,_ := primitive.ObjectIDFromHex(id)
-	update:=bson.M{
-		"$set":bson.M{
-			"title":t.Title,
-			"description":t.Description,
-			"due_date":t.Due_date,
-			"status":t.Status,
+
+// EditTask updates a task in the database based on the given ID.
+func EditTask(id string, s *mongo.Database, t *models.Task) (*models.Task, error) {
+	ID, _ := primitive.ObjectIDFromHex(id)
+	update := bson.M{
+		"$set": bson.M{
+			"title":       t.Title,
+			"description": t.Description,
+			"due_date":    t.Due_date,
+			"status":      t.Status,
 		},
 	}
-	data,err := s.Collection("Tasks").UpdateOne(context.TODO(),bson.M{"_id":ID},update)
+	_, err := s.Collection("Tasks").UpdateOne(context.TODO(), bson.M{"_id": ID}, update)
 	t.ID = ID
-	log.Println(err,data)
-	return t,err
-
+	return t, err
 }
