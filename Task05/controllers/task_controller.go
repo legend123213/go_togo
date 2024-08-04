@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,7 +36,9 @@ func GetTask(c *gin.Context,storage *mongo.Database){
 }
 func GetTasks(c *gin.Context,storage *mongo.Database){
 	data,err := data.GetTasks(storage)
-	log.Println(err)
+	if err != nil {
+		c.JSON(http.StatusBadRequest,err)
+	}
 	c.JSON(200,data)
 }
 func DeleteTask(c *gin.Context,storage *mongo.Database){
@@ -54,7 +55,6 @@ func EditTask(c *gin.Context,storage *mongo.Database){
 	var task models.Task
 	id := c.Param("id")
 	if err:=c.ShouldBindJSON(&task);err!=nil{
-		log.Println(err)
 		c.JSON(http.StatusBadRequest,err)
 		return
 	}
