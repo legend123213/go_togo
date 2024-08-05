@@ -13,13 +13,7 @@ import (
 
 
 
-type Tasks interface{
-	AddTask(task models.Task) (models.Task,error)
-	EditTask(task models.Task,id int) (models.Task,error)
-	GetTask(id int) (models.Task,error)
-	GetTasks() ([]models.Task,error)
-	DeleteTask(id int) error
-}
+
 
 
 
