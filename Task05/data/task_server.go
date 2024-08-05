@@ -45,7 +45,10 @@ func ServGetTasks(s *mongo.Database) ([]models.Task, error) {
 // DeleteTask deletes a task from the database based on the given ID.
 func ServDeleteTask(id string, s *mongo.Database) error {
 	ID, _ := primitive.ObjectIDFromHex(id)
-	_, err := s.Collection("Tasks").DeleteOne(context.TODO(), bson.M{"_id": ID})
+	check, err := s.Collection("Tasks").DeleteOne(context.TODO(), bson.M{"_id": ID})
+	if check.DeletedCount==0{
+		return errors.New("")
+	}
 	return err
 }
 

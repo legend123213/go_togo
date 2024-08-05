@@ -40,9 +40,9 @@ func GetTask(c *gin.Context, storage *mongo.Database) {
 func GetTasks(c *gin.Context, storage *mongo.Database) {
 	data, err := data.ServGetTasks(storage)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusInternalServerError, err)
 	}
-	c.JSON(200, data)
+	c.JSON(http.StatusOK, data)
 }
 
 // DeleteTask is a controller function that deletes a specific task from the database
@@ -50,7 +50,7 @@ func DeleteTask(c *gin.Context, storage *mongo.Database) {
 	id := c.Param("id")
 	err := data.ServDeleteTask(id, storage)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusNotFound, gin.H{"message":"no task found to be delete"})
 		return
 	}
 	c.JSON(http.StatusNoContent, gin.H{"message": "Successfully Deleted"})
@@ -66,7 +66,7 @@ func EditTask(c *gin.Context, storage *mongo.Database) {
 	}
 	edited, errDb := data.ServEditTask(id, storage, &task)
 	if errDb != nil {
-		c.JSON(http.StatusBadRequest,gin.H{"Message":"task not found to be edited"})
+		c.JSON(http.StatusNotFound,gin.H{"Message":"task not found to be edited"})
 		return
 	}
 	c.JSON(http.StatusAccepted, edited)
