@@ -30,7 +30,7 @@ func GetTask(c *gin.Context, storage *mongo.Database) {
 	id := c.Param("id")
 	data, err := data.ServGetTask(id, storage)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "can't find the task")
+		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
 		return
 	}
 	c.JSON(http.StatusOK, data)
