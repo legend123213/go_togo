@@ -9,14 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Tasks is an interface that defines the operations for managing tasks.
-type Tasks interface {
-	AddTask(task models.Task) (models.Task, error)
-	EditTask(task models.Task, id int) (models.Task, error)
-	GetTask(id int) (models.Task, error)
-	GetTasks() ([]models.Task, error)
-	DeleteTask(id int) error
-}
+
 
 // AddTask adds a new task to the database.
 func AddTask(task *models.Task, s *mongo.Database) (*models.Task, error) {
