@@ -27,8 +27,7 @@ Enhancing Task Management API with Persistent Data Storage using MongoDB and Mon
 
    5. Build and Run:
        ```bash
-       go build -o task_manager
-       ./task_manager
+       go run ./main.go
        ```
        This will build the executable and start the server. By default, the server will run on http://localhost:8080.
 

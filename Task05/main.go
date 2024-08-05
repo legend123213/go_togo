@@ -28,18 +28,14 @@ func main(){
 	//initializer for mongo server
 	client := MongoStarter("TaskManger")
 
-
 	// initializer for mongo server
 	server:=router.Api(client)
-
-
 	server.Run(":8000")
-
 
 }
 
+//function that connect mongodb and return  database instance
 func MongoStarter(dbname string) *mongo.Database{
-
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(MONGO_CLOUD_URL).SetServerAPIOptions(serverAPI)
 	client,err := mongo.Connect(context.TODO(),opts)
