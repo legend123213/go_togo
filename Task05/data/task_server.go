@@ -12,7 +12,7 @@ import (
 )
 
 // AddTask adds a new task to the database.
-func AddTask(task *models.Task, s *mongo.Database) (*models.Task, error) {
+func ServAddTask(task *models.Task, s *mongo.Database) (*models.Task, error) {
 	store := s.Collection("Tasks")
 	data, err := store.InsertOne(context.TODO(), *task)
 	id := data.InsertedID.(primitive.ObjectID)
@@ -21,7 +21,7 @@ func AddTask(task *models.Task, s *mongo.Database) (*models.Task, error) {
 }
 
 // GetTask retrieves a task from the database based on the given ID.
-func GetTask(id string, s *mongo.Database) (*models.Task, error) {
+func ServGetTask(id string, s *mongo.Database) (*models.Task, error) {
 	var task models.Task
 	ID, _ := primitive.ObjectIDFromHex(id)
 	err := s.Collection("Tasks").FindOne(context.TODO(), bson.M{"_id": ID}).Decode(&task)
@@ -29,7 +29,7 @@ func GetTask(id string, s *mongo.Database) (*models.Task, error) {
 }
 
 // GetTasks retrieves all tasks from the database.
-func GetTasks(s *mongo.Database) ([]models.Task, error) {
+func ServGetTasks(s *mongo.Database) ([]models.Task, error) {
 	var tasks []models.Task
 	iterDocument, err := s.Collection("Tasks").Find(context.TODO(), bson.D{})
 	for iterDocument.Next(context.TODO()) {
@@ -43,14 +43,14 @@ func GetTasks(s *mongo.Database) ([]models.Task, error) {
 }
 
 // DeleteTask deletes a task from the database based on the given ID.
-func DeleteTask(id string, s *mongo.Database) error {
+func ServDeleteTask(id string, s *mongo.Database) error {
 	ID, _ := primitive.ObjectIDFromHex(id)
 	_, err := s.Collection("Tasks").DeleteOne(context.TODO(), bson.M{"_id": ID})
 	return err
 }
 
 // EditTask updates a task in the database based on the given ID.
-func EditTask(id string, s *mongo.Database, t *models.Task) (*models.Task, error) {
+func ServEditTask(id string, s *mongo.Database, t *models.Task) (*models.Task, error) {
 	ID, err_:= primitive.ObjectIDFromHex(id)
 	log.Println(err_)
 	update := bson.M{

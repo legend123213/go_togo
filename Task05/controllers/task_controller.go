@@ -16,7 +16,7 @@ func AddTasks(c *gin.Context, storage *mongo.Database) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	data, err := data.AddTask(&task, storage)
+	data, err := data.ServAddTask(&task, storage)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "db error")
@@ -28,7 +28,7 @@ func AddTasks(c *gin.Context, storage *mongo.Database) {
 // GetTask is a controller function that retrieves a specific task from the database
 func GetTask(c *gin.Context, storage *mongo.Database) {
 	id := c.Param("id")
-	data, err := data.GetTask(id, storage)
+	data, err := data.ServGetTask(id, storage)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "can't find the task")
 		return
@@ -38,7 +38,7 @@ func GetTask(c *gin.Context, storage *mongo.Database) {
 
 // GetTasks is a controller function that retrieves all tasks from the database
 func GetTasks(c *gin.Context, storage *mongo.Database) {
-	data, err := data.GetTasks(storage)
+	data, err := data.ServGetTasks(storage)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 	}
@@ -48,7 +48,7 @@ func GetTasks(c *gin.Context, storage *mongo.Database) {
 // DeleteTask is a controller function that deletes a specific task from the database
 func DeleteTask(c *gin.Context, storage *mongo.Database) {
 	id := c.Param("id")
-	err := data.DeleteTask(id, storage)
+	err := data.ServDeleteTask(id, storage)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
@@ -64,7 +64,7 @@ func EditTask(c *gin.Context, storage *mongo.Database) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-	edited, errDb := data.EditTask(id, storage, &task)
+	edited, errDb := data.ServEditTask(id, storage, &task)
 	if errDb != nil {
 		c.JSON(http.StatusBadRequest,gin.H{"Message":"task not found to be edited"})
 		return
