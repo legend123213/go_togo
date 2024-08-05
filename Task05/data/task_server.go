@@ -2,17 +2,14 @@ package data
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	"github.com/legend123213/go_togo/Task05/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-
-
-
-
 
 // AddTask adds a new task to the database.
 func AddTask(task *models.Task, s *mongo.Database) (*models.Task, error) {
@@ -54,7 +51,8 @@ func DeleteTask(id string, s *mongo.Database) error {
 
 // EditTask updates a task in the database based on the given ID.
 func EditTask(id string, s *mongo.Database, t *models.Task) (*models.Task, error) {
-	ID, _ := primitive.ObjectIDFromHex(id)
+	ID, err_:= primitive.ObjectIDFromHex(id)
+	log.Println(err_)
 	update := bson.M{
 		"$set": bson.M{
 			"title":       t.Title,
@@ -63,7 +61,11 @@ func EditTask(id string, s *mongo.Database, t *models.Task) (*models.Task, error
 			"status":      t.Status,
 		},
 	}
-	_, err := s.Collection("Tasks").UpdateOne(context.TODO(), bson.M{"_id": ID}, update)
+	check, err := s.Collection("Tasks").UpdateOne(context.TODO(), bson.M{"_id": ID}, update)
 	t.ID = ID
+	if check.MatchedCount==0{
+		return t,errors.New("")
+	}
 	return t, err
 }
+

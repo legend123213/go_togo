@@ -64,10 +64,10 @@ func EditTask(c *gin.Context, storage *mongo.Database) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-	data, err := data.EditTask(id, storage, &task)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+	edited, errDb := data.EditTask(id, storage, &task)
+	if errDb != nil {
+		c.JSON(http.StatusBadRequest,gin.H{"Message":"task not found to be edited"})
 		return
 	}
-	c.JSON(http.StatusAccepted, data)
+	c.JSON(http.StatusAccepted, edited)
 }
