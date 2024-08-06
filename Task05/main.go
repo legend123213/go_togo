@@ -22,7 +22,7 @@ func init(){
     }
 }
 func main(){
-	//importing api key for cloud mongo
+	//importing api key for cloud mongo1
 	MONGO_CLOUD_URL=os.Getenv("MONGO_CLOUD_URL")
 	
 	//initializer for mongo server
