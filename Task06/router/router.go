@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/legend123213/go_togo/Task06/controllers"
+	"github.com/legend123213/go_togo/Task06/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -14,19 +15,23 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 	var taskController controllers.TaskControllerInter = controllers.NewTc(dbmongo)
 
 	//user route
-	server.POST("api/v1/login",userController.CreateUser)
+	server.POST("api/v1/login",userController.LogUser)
+	server.POST("api/v1/signup",userController.CreateUser)
+	server.Use(middleware.AuthMiddleware())
+	server.Use(middleware.AdminMiddleware())
 	server.GET("api/v1/user/:id",userController.GetUser)
 	server.GET("api/v1/users",userController.GetAllUser)
 	server.PUT("api/v1/user/:id",userController.UpdateUser)
 	server.DELETE("api/v1/user/:id",userController.RemoveUser)
+	server.POST("api/v1/promote/:id",userController.MakeAdmin)
 
 
 	//task route
-	server.POST("api/v1/login",taskController.CreateTask)
-	server.GET("api/v1/user/:id",taskController.GetTask)
-	server.GET("api/v1/users",taskController.GetAllTask)
-	server.PUT("api/v1/user/:id",taskController.UpdateTask)
-	server.DELETE("api/v1/user/:id",taskController.RemoveTask)
+	server.POST("api/v1/task",taskController.CreateTask)
+	server.GET("api/v1/task/:id",taskController.GetTask)
+	server.GET("api/v1/tasks",taskController.GetAllTask)
+	server.PUT("api/v1/task/:id",taskController.UpdateTask)
+	server.DELETE("api/v1/task/:id",taskController.RemoveTask)
 
 
 	
