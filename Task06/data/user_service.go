@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/legend123213/go_togo/Task06/models"
@@ -15,7 +16,7 @@ import (
 
 // Generate JWT
 func genratetoken(user *models.User,pwd string) (string,error){
-	var jwtSecret = []byte("your_jwt_secret")
+	var jwtSecret = []byte(os.Getenv("JWT_SECRET_KEY"))
 	log.Println(pwd,user.Password)
 	// User login logic
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pwd)) != nil {
