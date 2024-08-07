@@ -18,18 +18,21 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 	server.POST("api/v1/login",userController.LogUser)
 	server.POST("api/v1/signup",userController.CreateUser)
 	server.Use(middleware.AuthMiddleware())
-	server.Use(middleware.AdminMiddleware())
-	server.GET("api/v1/user/:id",userController.GetUser)
-	server.GET("api/v1/users",userController.GetAllUser)
+
+	server.GET("api/v1/task/:id",taskController.GetTask)
+	server.GET("api/v1/tasks",taskController.GetAllTask)
 	server.PUT("api/v1/user/:id",userController.UpdateUser)
+	server.GET("api/v1/user/:id",userController.GetUser)
+	server.Use(middleware.AdminMiddleware())
+	
+	server.GET("api/v1/users",userController.GetAllUser)
+	
 	server.DELETE("api/v1/user/:id",userController.RemoveUser)
 	server.POST("api/v1/promote/:id",userController.MakeAdmin)
 
 
 	//task route
 	server.POST("api/v1/task",taskController.CreateTask)
-	server.GET("api/v1/task/:id",taskController.GetTask)
-	server.GET("api/v1/tasks",taskController.GetAllTask)
 	server.PUT("api/v1/task/:id",taskController.UpdateTask)
 	server.DELETE("api/v1/task/:id",taskController.RemoveTask)
 
