@@ -21,7 +21,6 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 
 	server.GET("api/v1/task/:id",taskController.GetTask)
 	server.GET("api/v1/tasks",taskController.GetAllTask)
-	server.PUT("api/v1/user/:id",userController.UpdateUser)
 	server.GET("api/v1/user/:id",userController.GetUser)
 	server.Use(middleware.AdminMiddleware())
 	
@@ -31,7 +30,6 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 	server.PATCH("api/v1/promote/:id",userController.MakeAdmin)
 
 
-	//task route
 	server.POST("api/v1/task",taskController.CreateTask)
 	server.PUT("api/v1/task/:id",taskController.UpdateTask)
 	server.DELETE("api/v1/task/:id",taskController.RemoveTask)
