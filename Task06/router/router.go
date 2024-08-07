@@ -28,7 +28,7 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 	server.GET("api/v1/users",userController.GetAllUser)
 	
 	server.DELETE("api/v1/user/:id",userController.RemoveUser)
-	server.POST("api/v1/promote/:id",userController.MakeAdmin)
+	server.PATCH("api/v1/promote/:id",userController.MakeAdmin)
 
 
 	//task route
