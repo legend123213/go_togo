@@ -15,8 +15,8 @@ import (
 
 type TaskInterface interface{
 	SAddTask(task *models.Task,s *mongo.Database)(*models.Task,error)
-	SGetTask(id string,s *mongo.Database)(*models.Task, error)
-	SGetTasks(s *mongo.Database) ([]models.Task, error)
+	SGetTask(id string,username string,s *mongo.Database)(*models.Task, error)
+	SGetTasks(user_id string,s *mongo.Database) ([]models.Task, error)
 	SDeleteTask(id string,s *mongo.Database) error
 	SEditTask(id string, s *mongo.Database, t *models.Task) (*models.Task, error)
 
@@ -41,17 +41,27 @@ func (this *TaskServiceRepo)SAddTask(task *models.Task, s *mongo.Database) (*mod
 	return task, err
 }
 // GetTask retrieves a task from the database based on the given ID.
-func  (this *TaskServiceRepo)SGetTask(id string, s *mongo.Database) (*models.Task, error) {
+func  (this *TaskServiceRepo)SGetTask(id string,user_id string, s *mongo.Database) (*models.Task, error) {
 	var task models.Task
 	ID, _ := primitive.ObjectIDFromHex(id)
-	err := s.Collection("Tasks").FindOne(context.TODO(), bson.M{"_id": ID}).Decode(&task)
+	serachIndex:=bson.M{"_id": ID}
+	if user_id!=""{
+		serachIndex =bson.M{"_id": ID,"user_id":user_id}
+	}
+	err := s.Collection("Tasks").FindOne(context.TODO(),serachIndex ).Decode(&task)
 	return &task, err
 }
 
 // GetTasks retrieves all tasks from the database.
-func (this *TaskServiceRepo) SGetTasks(s *mongo.Database) ([]models.Task, error) {
+func (this *TaskServiceRepo) SGetTasks(user_id string,s *mongo.Database) ([]models.Task, error) {
 	var tasks []models.Task
-	iterDocument, err := s.Collection("Tasks").Find(context.TODO(), bson.D{})
+	serachIndex:=bson.M{}
+	if user_id!=""{
+		serachIndex =bson.M{"user_id":user_id}
+	}
+
+	iterDocument, err := s.Collection("Tasks").Find(context.TODO(),serachIndex)
+	log.Println(err)
 	for iterDocument.Next(context.TODO()) {
 		var task models.Task
 		if err := iterDocument.Decode(&task); err != nil {
@@ -59,6 +69,7 @@ func (this *TaskServiceRepo) SGetTasks(s *mongo.Database) ([]models.Task, error)
 		}
 		tasks = append(tasks, task)
 	}
+	
 	return tasks, err
 }
 
