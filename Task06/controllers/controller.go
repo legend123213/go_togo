@@ -182,6 +182,7 @@ func (u *Tc)GetTask(c *gin.Context){
 		data, err := u.task.SGetTask(id, "",storage)
 		if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
+		c.Abort()
 		return
 	}
 	c.JSON(http.StatusOK, data)
@@ -190,6 +191,7 @@ func (u *Tc)GetTask(c *gin.Context){
 		data, err := u.task.SGetTask(id,user_ID , storage)
 		if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
+		c.Abort()
 		return
 	}
 	c.JSON(http.StatusOK, data)
