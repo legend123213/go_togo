@@ -3,19 +3,21 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/legend123213/go_togo/Task06/data"
 	"github.com/legend123213/go_togo/Task06/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-func isEmailUnique(ctx context.Context, collection *mongo.Collection, email string) error {
+func isUsernameUnique(ctx context.Context, collection *mongo.Collection, username string) error {
     var existingUser models.User
-    err := collection.FindOne(ctx, bson.M{"email": email}).Decode(&existingUser)
+    err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&existingUser)
     if err == nil {
-        return fmt.Errorf("email '%s' already exists", email)
+        return fmt.Errorf("username '%s' already exists", username)
     }
     if err == mongo.ErrNoDocuments {
         return nil 
@@ -52,7 +54,7 @@ func (u *Uc)CreateUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := isEmailUnique(context.TODO(), u.DbStorage.Collection("Users"), user.Username); err != nil {
+	if err := isUsernameUnique(context.TODO(), u.DbStorage.Collection("Users"), user.Username); err != nil {
         c.JSON(http.StatusConflict,gin.H{"message":err.Error() })
 		  return 
     }
@@ -144,9 +146,11 @@ func (u *Tc)CreateTask(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	data, err := u.task.SAddTask(&task, storage)
+	dataaa, _ := c.Get("id")
+	task.UserID = dataaa.(primitive.ObjectID)
+	data, err_ := u.task.SAddTask(&task, storage)
 
-	if err != nil {
+	if err_ != nil {
 		c.JSON(http.StatusInternalServerError, "db error")
 		return
 	}
@@ -172,12 +176,27 @@ func (u *Tc)UpdateTask(c *gin.Context){
 func (u *Tc)GetTask(c *gin.Context){
 	storage := u.DbStorage
 	id := c.Param("id")
-	data, err := u.task.SGetTask(id, storage)
-	if err != nil {
+	admin := c.MustGet("isActive").(bool)
+	user_id:=c.MustGet("id").(primitive.ObjectID)
+	if admin{
+		data, err := u.task.SGetTask(id, "",storage)
+		if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
 		return
 	}
 	c.JSON(http.StatusOK, data)
+	}else{
+		user_ID:=user_id.String()
+		data, err := u.task.SGetTask(id,user_ID , storage)
+		if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
+		return
+	}
+	c.JSON(http.StatusOK, data)
+	}
+
+	
+
 
 }
 func (u *Tc)RemoveTask(c *gin.Context){
@@ -193,10 +212,26 @@ func (u *Tc)RemoveTask(c *gin.Context){
 }
 func (u *Tc)GetAllTask(c *gin.Context){
 	storage := u.DbStorage
-	data, err := u.task.SGetTasks(storage)
+	admin := c.MustGet("isActive").(bool)
+	user_id:=c.MustGet("id").(primitive.ObjectID)
+	if admin{
+		data, err := u.task.SGetTasks("",storage)
+		log.Println(data,err)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
+		return
 	}
 	c.JSON(http.StatusOK, data)
+		
+	}else{
+		user_ID:=user_id.String()
+		data, err := u.task.SGetTasks(user_ID,storage)
+		if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, data)
+	}
+	
 
 }
