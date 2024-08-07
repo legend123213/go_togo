@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
@@ -21,7 +22,7 @@ type Claims struct {
 func AuthMiddleware()gin.HandlerFunc{
 	return func(c *gin.Context) {
 
-	var jwtSecret = []byte("your_jwt_secret")
+	var jwtSecret = []byte(os.Getenv("JWT_SECRET_KEY"))
 	authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
@@ -36,6 +37,7 @@ func AuthMiddleware()gin.HandlerFunc{
 
     if err != nil {
         c.JSON(http.StatusForbidden,err)
+		  return 
     }
 
     // Extract the claims
