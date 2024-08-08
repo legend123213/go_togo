@@ -170,6 +170,9 @@ func (u *UserServiceRepo) RoleChanger(id string,s *mongo.Database)(error){
 	if err != nil {
 		return errors.New("user not found")
 	}
+	if User.IsAdmin {
+		return errors.New("user already admin")
+	}
 	User.IsAdmin = true
 	update := bson.M{
 		"$set": bson.M{

@@ -108,10 +108,14 @@ func (u *Uc)GetAllUser(c *gin.Context){
 func (u *Uc)MakeAdmin(c *gin.Context){
 	id := c.Param("id")
 	store:=u.DbStorage
-	makeAdmin := u.service.RoleChanger(id,store)
-	if makeAdmin != nil{
-		c.JSON(http.StatusInternalServerError,gin.H{"error":"request is failed"})
-		return 
+	err := u.service.RoleChanger(id,store)
+	if err != nil {
+		if err.Error() == "user already admin" {
+			c.JSON(http.StatusConflict, gin.H{"message": "User is already an admin"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
 	}
 	c.JSON(http.StatusAccepted,gin.H{"message":"user promoted"})
 
