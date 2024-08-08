@@ -28,3 +28,5 @@ go.work.sum
 /Task06/.env
 /Task06/go.sum
 go.sum
+/task-manager/go.sum
+/task-manager/Delivery/.env
