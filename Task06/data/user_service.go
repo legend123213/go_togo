@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/legend123213/go_togo/Task06/models"
@@ -17,16 +18,21 @@ import (
 // Generate JWT
 func genratetoken(user *models.User,pwd string) (string,error){
 	var jwtSecret = []byte(os.Getenv("JWT_SECRET_KEY"))
-	log.Println(pwd,user.Password)
 	// User login logic
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pwd)) != nil {
   return "Invalid username or password",nil
 			}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	"id":user.ID,
-  "role": user.IsAdmin,
-  "username":   user.Username,
-})
+
+expirationTime := time.Now().Add(24 * 7 * time.Hour)
+claims := &Claims{
+		ID:       user.ID,
+		Username: user.Username,
+		IsAdmin:  user.IsAdmin,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+token := jwt.NewWithClaims(jwt.SigningMethodHS256,claims)
 
 jwtToken, err := token.SignedString(jwtSecret)
 return jwtToken,err
@@ -34,33 +40,6 @@ return jwtToken,err
 }
 
 
-
-func ExtractUserDataFromToken(tokenString string) (*models.User, error) {
-    var jwtSecret = []byte("your_jwt_secret")
-
-    // Parse the token
-    token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-        return jwtSecret, nil
-    })
-
-    if err != nil {
-        return nil, err
-    }
-
-    // Extract the claims
-    if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		id := claims.ID
-		
-		user := &models.User{
-			ID:       id,
-			Username: claims.Username,
-			IsAdmin:  claims.IsAdmin,
-		}
-        return user, nil
-    }
-
-    return nil, errors.New("invalid token")
-}
 
 
 
