@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -62,7 +61,6 @@ func AuthMiddleware()gin.HandlerFunc{
 				}
 				c.Set("id", user.ID)
 				c.Set("username", user.Username)
-				log.Println(user.IsAdmin, user.Username, user)
 				c.Set("isActive", user.IsAdmin)
 				c.Next()
 			}
@@ -76,7 +74,6 @@ func AuthMiddleware()gin.HandlerFunc{
 func AdminMiddleware() gin.HandlerFunc{
 	return func (c *gin.Context)  {
 		isadmin, _ := c.MustGet("isActive").(bool)
-		log.Println(isadmin)
 		if isadmin {
 			c.Next()
 			

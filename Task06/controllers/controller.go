@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -241,7 +240,6 @@ func (u *Tc)GetAllTask(c *gin.Context){
 	user_id:=c.MustGet("id").(primitive.ObjectID)
 	if admin{
 		data, err := u.task.SGetTasks("",storage)
-		log.Println(data,err)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

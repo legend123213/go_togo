@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,23 +28,23 @@ func NewUc(userusecase usecases.UserUsecaseInt) *Uc{
 		userusecase:userusecase,
 	}
 }
-func (u *Uc)CreateUser(c *gin.Context){
+func (u *Uc)CreateUser(c *gin.Context) {
 	var user domain.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if err := u.userusecase.IsUsernameUnique(user.Username); err != nil {
-        c.JSON(http.StatusConflict,gin.H{"message":err.Error() })
-		  return 
-    }
-
-	res,err := u.userusecase.Register(&user)
-	if err!=nil{
-		c.JSON(http.StatusBadRequest, gin.H{"error": res})
+		c.JSON(http.StatusConflict, gin.H{"message": err.Error()})
+		return 
 	}
-	c.JSON(http.StatusAccepted, gin.H{"message": "User registered in successfully", "token": res})
 
+	res, err := u.userusecase.Register(&user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": res})
+		return 
+	}
+	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully", "token": res})
 }
 func (u *Uc) LogUser(c *gin.Context){
 	var user domain.User
@@ -59,7 +58,7 @@ func (u *Uc) LogUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": res})
 		return 
 	}
-	c.JSON(http.StatusAccepted, gin.H{"message": "User login in successfully", "token": res})
+	c.JSON(http.StatusOK, gin.H{"message": "User login in successfully", "token": res})
 
 }
 func (u *Uc)UpdateUser(c *gin.Context){
@@ -75,39 +74,36 @@ func (u *Uc)UpdateUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK,editedUser)
+	c.JSON(http.StatusOK, gin.H{"message": "User profile updated successfully", "user": editedUser})
 
 }
 func (u *Uc)GetUser(c *gin.Context){
 	id := c.Param("id")
 	user,err := u.userusecase.Fetch(id)
 	if err != nil{
-		c.JSON(http.StatusNotFound,err)
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK,user)
-
+	c.JSON(http.StatusOK, gin.H{"message": "User profile fetched successfully", "user": user})
 }
 
 func (u *Uc)RemoveUser(c *gin.Context){
 	id := c.Param("id")
-	if id ==""{
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be add in request"})
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be added in the request"})
 		return
 	}
 	
-	err:=u.userusecase.Delete(id)
-	if err != nil{
-		c.JSON(http.StatusNotFound,err)
+	err := u.userusecase.Delete(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusAccepted,gin.H{"message":"deletion successful"})
-
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
 func (u *Uc)GetAllUser(c *gin.Context){
 	service := u.userusecase.FetchAllUser()
-	c.JSON(http.StatusOK,service)
-
+	c.JSON(http.StatusOK, gin.H{"message": "All users fetched successfully", "users": service})
 }
 func (u *Uc)MakeAdmin(c *gin.Context){
 	id := c.Param("id")
@@ -120,8 +116,7 @@ func (u *Uc)MakeAdmin(c *gin.Context){
 		}
 		return
 	}
-	c.JSON(http.StatusAccepted,gin.H{"message":"user promoted"})
-
+	c.JSON(http.StatusOK, gin.H{"message": "User promoted to admin successfully"})
 }
 
 
@@ -151,32 +146,31 @@ func (u *Tc)CreateTask(c *gin.Context){
 	}
 	objectID,_ := primitive.ObjectIDFromHex("")
 	if task.UserID == objectID{
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be add in request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be added in the request"})
 		return
 	}
-	data, err_ := u.taskusecase.Create(&task)
+	data, err := u.taskusecase.Create(&task)
 
-	if err_ != nil {
-		c.JSON(http.StatusInternalServerError, "db error")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create task"})
 		return
 	}
-	c.JSON(http.StatusAccepted, data)
+	c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "task": data})
 
 }
 func (u *Tc)UpdateTask(c *gin.Context){
 	var task domain.Task
 	id := c.Param("id")
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	edited, errDb := u.taskusecase.UpdateTask(id, &task)
 	if errDb != nil {
-		c.JSON(http.StatusNotFound,gin.H{"Message":"task not found to be edited"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "Task not found"})
 		return
 	}
-	c.JSON(http.StatusAccepted, edited)
-
+	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully", "task": edited})
 }
 func (u *Tc)GetTask(c *gin.Context){
 	id := c.Param("id")
@@ -185,57 +179,46 @@ func (u *Tc)GetTask(c *gin.Context){
 	if admin{
 		data, err := u.taskusecase.FetchTask(id, "",)
 		if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
-		c.Abort()
-		return
-	}
-	c.JSON(http.StatusOK, data)
+			c.JSON(http.StatusNotFound, gin.H{"error":"Task not found"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Task fetched successfully", "task": data})
 	}else{
 		user_ID:=user_id.String()
 		data, err := u.taskusecase.FetchTask(id,user_ID)
 		if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
-		c.Abort()
-		return
+			c.JSON(http.StatusNotFound, gin.H{"error":"Task not found"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Task fetched successfully", "task": data})
 	}
-	c.JSON(http.StatusOK, data)
-	}
-
-	
-
-
 }
 func (u *Tc)RemoveTask(c *gin.Context){
 	id := c.Param("id")
-	err :=u.taskusecase.RemoveTask(id)
+	err := u.taskusecase.RemoveTask(id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message":"no task found to be delete"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "No task found to be deleted"})
 		return
 	}
-	c.JSON(http.StatusNoContent, gin.H{"message": "Successfully Deleted"})
-
+	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
 }
 func (u *Tc)GetAllTask(c *gin.Context){
 	admin := c.MustGet("isActive").(bool)
 	user_id:=c.MustGet("id").(primitive.ObjectID)
 	if admin{
-		data, err := u.taskusecase.FetchTasks("",)
-		log.Println(data,err)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	c.JSON(http.StatusOK, data)
-		
+		data, err := u.taskusecase.FetchTasks("")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "All tasks fetched successfully", "tasks": data})
 	}else{
 		user_ID:=user_id.String()
 		data, err := u.taskusecase.FetchTasks(user_ID)
 		if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "User tasks fetched successfully", "tasks": data})
 	}
-	c.JSON(http.StatusOK, data)
-	}
-	
-
 }

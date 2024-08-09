@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"errors"
-	"log"
 
 	domain "github.com/legend123213/go_togo/Task07/task-manager/Domain"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,7 +61,6 @@ func (this *TaskServiceRepo) SGetTasks(user_id string) ([]domain.Task, error) {
 	}
 
 	iterDocument, err := this.Database_mongo.Collection("Tasks").Find(context.TODO(),serachIndex)
-	log.Println(err)
 	for iterDocument.Next(context.TODO()) {
 		var task domain.Task
 		if err := iterDocument.Decode(&task); err != nil {
@@ -86,8 +84,7 @@ func (this *TaskServiceRepo) SDeleteTask(id string) error {
 
 // EditTask updates a task in the database based on the given ID.
 func  (this *TaskServiceRepo)SEditTask(id string, t *domain.Task) (*domain.Task, error) {
-	ID, err_:= primitive.ObjectIDFromHex(id)
-	log.Println(err_)
+	ID, _:= primitive.ObjectIDFromHex(id)
 	update := bson.M{
 		"$set": bson.M{
 			"title":       t.Title,

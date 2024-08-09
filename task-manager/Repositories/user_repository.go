@@ -89,8 +89,7 @@ func (u *UserServiceRepo) RegisterUser(user *domain.User) (string, error) {
 
 // EditUser updates the details of a user.
 func (u *UserServiceRepo) EditUser(id string, user *domain.User) (*domain.User, error) {
-	ID, err_ := primitive.ObjectIDFromHex(id)
-	log.Println(err_)
+	ID, _ := primitive.ObjectIDFromHex(id)
 	update := bson.M{
 		"$set": bson.M{
 			"username": user.Username,

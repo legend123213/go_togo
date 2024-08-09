@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"errors"
-	"log"
 
 	"github.com/legend123213/go_togo/Task06/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -61,7 +60,7 @@ func (this *TaskServiceRepo) SGetTasks(user_id string,s *mongo.Database) ([]mode
 	}
 
 	iterDocument, err := s.Collection("Tasks").Find(context.TODO(),serachIndex)
-	log.Println(err)
+	
 	for iterDocument.Next(context.TODO()) {
 		var task models.Task
 		if err := iterDocument.Decode(&task); err != nil {
@@ -85,8 +84,7 @@ func (this *TaskServiceRepo) SDeleteTask(id string, s *mongo.Database) error {
 
 // EditTask updates a task in the database based on the given ID.
 func  (this *TaskServiceRepo)SEditTask(id string, s *mongo.Database, t *models.Task) (*models.Task, error) {
-	ID, err_:= primitive.ObjectIDFromHex(id)
-	log.Println(err_)
+	ID, _:= primitive.ObjectIDFromHex(id)
 	update := bson.M{
 		"$set": bson.M{
 			"title":       t.Title,
