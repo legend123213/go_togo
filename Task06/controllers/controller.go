@@ -185,7 +185,7 @@ func (u *Tc)CreateTask(c *gin.Context){
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
-	c.JSON(http.StatusCreated, data)
+	c.JSON(http.StatusCreated, gin.H{"message": "Task created successfully", "Task": data})
 
 }
 func (u *Tc)UpdateTask(c *gin.Context){
@@ -201,7 +201,7 @@ func (u *Tc)UpdateTask(c *gin.Context){
 		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 		return
 	}
-	c.JSON(http.StatusOK, edited)
+	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully", "task": edited})
 }
 func (u *Tc)GetTask(c *gin.Context){
 	storage := u.DbStorage
@@ -214,7 +214,7 @@ func (u *Tc)GetTask(c *gin.Context){
 			c.JSON(http.StatusNotFound, gin.H{"error":"Task not found"})
 			return
 		}
-		c.JSON(http.StatusOK, data)
+		c.JSON(http.StatusOK, gin.H{"task": data})
 	}else{
 		user_ID:=user_id.String()
 		data, err := u.task.SGetTask(id,user_ID , storage)
@@ -222,7 +222,7 @@ func (u *Tc)GetTask(c *gin.Context){
 			c.JSON(http.StatusNotFound, gin.H{"error":"Task not found"})
 			return
 		}
-		c.JSON(http.StatusOK, data)
+		c.JSON(http.StatusOK, gin.H{"task": data})
 	}
 }
 func (u *Tc)RemoveTask(c *gin.Context){
@@ -234,7 +234,6 @@ func (u *Tc)RemoveTask(c *gin.Context){
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
-
 }
 func (u *Tc)GetAllTask(c *gin.Context){
 	storage := u.DbStorage
@@ -247,7 +246,7 @@ func (u *Tc)GetAllTask(c *gin.Context){
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, data)
+		c.JSON(http.StatusOK, gin.H{"tasks": data})
 	}else{
 		user_ID:=user_id.String()
 		data, err := u.task.SGetTasks(user_ID,storage)
@@ -255,6 +254,6 @@ func (u *Tc)GetAllTask(c *gin.Context){
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, data)
+		c.JSON(http.StatusOK, gin.H{"tasks": data}) 
 	}
 }
