@@ -63,6 +63,19 @@ func (u *Uc) LogUser(c *gin.Context){
 
 }
 func (u *Uc)UpdateUser(c *gin.Context){
+	var user domain.User
+	ID:=c.Param("id")
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	editedUser,err := u.userusecase.Edit(ID,&user)
+	if err!=nil{
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK,editedUser)
 
 }
 func (u *Uc)GetUser(c *gin.Context){
@@ -77,6 +90,18 @@ func (u *Uc)GetUser(c *gin.Context){
 }
 
 func (u *Uc)RemoveUser(c *gin.Context){
+	id := c.Param("id")
+	if id ==""{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be add in request"})
+		return
+	}
+	
+	err:=u.userusecase.Delete(id)
+	if err != nil{
+		c.JSON(http.StatusNotFound,err)
+		return
+	}
+	c.JSON(http.StatusAccepted,gin.H{"message":"deletion successful"})
 
 }
 func (u *Uc)GetAllUser(c *gin.Context){
@@ -124,8 +149,11 @@ func (u *Tc)CreateTask(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	dataaa, _ := c.Get("id")
-	task.UserID = dataaa.(primitive.ObjectID)
+	objectID,_ := primitive.ObjectIDFromHex("")
+	if task.UserID == objectID{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be add in request"})
+		return
+	}
 	data, err_ := u.taskusecase.Create(&task)
 
 	if err_ != nil {
