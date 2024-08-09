@@ -23,7 +23,7 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 	server.POST("api/v1/login",userController.LogUser)
 	server.POST("api/v1/signup",userController.CreateUser)
 	server.Use(Infrastructure.AuthMiddleware())
-
+	server.PUT("api/v1/user/:id",userController.UpdateUser)
 	server.GET("api/v1/task/:id",taskController.GetTask)
 	server.GET("api/v1/tasks",taskController.GetAllTask)
 	server.GET("api/v1/user/:id",userController.GetUser)
@@ -35,7 +35,7 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 	server.PATCH("api/v1/promote/:id",userController.MakeAdmin)
 
 
-	server.POST("api/v1/task",taskController.CreateTask)
+	server.POST("api/v1/task/",taskController.CreateTask)
 	server.PUT("api/v1/task/:id",taskController.UpdateTask)
 	server.DELETE("api/v1/task/:id",taskController.RemoveTask)
 
