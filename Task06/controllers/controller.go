@@ -55,15 +55,15 @@ func (u *Uc)CreateUser(c *gin.Context){
 		return
 	}
 	if err := isUsernameUnique(context.TODO(), u.DbStorage.Collection("Users"), user.Username); err != nil {
-        c.JSON(http.StatusConflict,gin.H{"message":err.Error() })
-		  return 
-    }
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	res,err := u.service.RegisterUser(&user,storage)
 	if err!=nil{
 		c.JSON(http.StatusBadRequest, gin.H{"error": res})
 	}
-	c.JSON(http.StatusAccepted, gin.H{"message": "User registered in successfully", "token": res})
+	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully", "token": res})
 
 }
 func (u *Uc) LogUser(c *gin.Context){
@@ -76,13 +76,26 @@ func (u *Uc) LogUser(c *gin.Context){
 
 	res,err := u.service.LoginUser(&user,storage)
 	if err!=nil{
-		c.JSON(http.StatusBadRequest, gin.H{"error": res})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": res})
 		return 
 	}
-	c.JSON(http.StatusAccepted, gin.H{"message": "User login in successfully", "token": res})
+	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully", "token": res})
 
 }
 func (u *Uc)UpdateUser(c *gin.Context){
+	var user models.User
+	ID:=c.Param("id")
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	editedUser,err := u.service.EditUser(ID,&user,u.DbStorage)
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK,editedUser)
 
 }
 func (u *Uc)GetUser(c *gin.Context){
@@ -90,20 +103,30 @@ func (u *Uc)GetUser(c *gin.Context){
 	store := u.DbStorage
 	user,err := u.service.GetUser(id,store)
 	if err != nil{
-		c.JSON(http.StatusNotFound,err)
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK,user)
+	c.JSON(http.StatusOK, gin.H{"user": user})
 
 }
 func (u *Uc)RemoveUser(c *gin.Context){
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be added in the request"})
+		return
+	}
 
+	err := u.service.DeleteUser(id, u.DbStorage)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
 func (u *Uc)GetAllUser(c *gin.Context){
-	store:=u.DbStorage
+	store := u.DbStorage
 	service := u.service.GetAllUser(store)
-	c.JSON(http.StatusOK,service)
-
+	c.JSON(http.StatusOK, service)
 }
 func (u *Uc)MakeAdmin(c *gin.Context){
 	id := c.Param("id")
@@ -117,7 +140,7 @@ func (u *Uc)MakeAdmin(c *gin.Context){
 		}
 		return
 	}
-	c.JSON(http.StatusAccepted,gin.H{"message":"user promoted"})
+	c.JSON(http.StatusOK, gin.H{"message": "User promoted successfully"})
 
 }
 
@@ -150,15 +173,19 @@ func (u *Tc)CreateTask(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	dataaa, _ := c.Get("id")
-	task.UserID = dataaa.(primitive.ObjectID)
+
+	objectID,_ := primitive.ObjectIDFromHex("")
+	if task.UserID == objectID{
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id must be add in request"})
+		return
+	}
 	data, err_ := u.task.SAddTask(&task, storage)
 
 	if err_ != nil {
-		c.JSON(http.StatusInternalServerError, "db error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
-	c.JSON(http.StatusAccepted, data)
+	c.JSON(http.StatusCreated, data)
 
 }
 func (u *Tc)UpdateTask(c *gin.Context){
@@ -166,16 +193,15 @@ func (u *Tc)UpdateTask(c *gin.Context){
 	var task models.Task
 	id := c.Param("id")
 	if err := c.ShouldBindJSON(&task); err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	edited, errDb := u.task.SEditTask(id, storage, &task)
 	if errDb != nil {
-		c.JSON(http.StatusNotFound,gin.H{"Message":"task not found to be edited"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 		return
 	}
-	c.JSON(http.StatusAccepted, edited)
-
+	c.JSON(http.StatusOK, edited)
 }
 func (u *Tc)GetTask(c *gin.Context){
 	storage := u.DbStorage
@@ -185,35 +211,29 @@ func (u *Tc)GetTask(c *gin.Context){
 	if admin{
 		data, err := u.task.SGetTask(id, "",storage)
 		if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
-		c.Abort()
-		return
-	}
-	c.JSON(http.StatusOK, data)
+			c.JSON(http.StatusNotFound, gin.H{"error":"Task not found"})
+			return
+		}
+		c.JSON(http.StatusOK, data)
 	}else{
 		user_ID:=user_id.String()
 		data, err := u.task.SGetTask(id,user_ID , storage)
 		if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message":"can't find the task"})
-		c.Abort()
-		return
+			c.JSON(http.StatusNotFound, gin.H{"error":"Task not found"})
+			return
+		}
+		c.JSON(http.StatusOK, data)
 	}
-	c.JSON(http.StatusOK, data)
-	}
-
-	
-
-
 }
 func (u *Tc)RemoveTask(c *gin.Context){
 	storage:= u.DbStorage
 	id := c.Param("id")
 	err :=u.task.SDeleteTask(id, storage)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message":"no task found to be delete"})
+		c.JSON(http.StatusNotFound, gin.H{"error":"Task not found"})
 		return
 	}
-	c.JSON(http.StatusNoContent, gin.H{"message": "Successfully Deleted"})
+	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
 
 }
 func (u *Tc)GetAllTask(c *gin.Context){
@@ -223,21 +243,18 @@ func (u *Tc)GetAllTask(c *gin.Context){
 	if admin{
 		data, err := u.task.SGetTasks("",storage)
 		log.Println(data,err)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	c.JSON(http.StatusOK, data)
-		
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, data)
 	}else{
 		user_ID:=user_id.String()
 		data, err := u.task.SGetTasks(user_ID,storage)
 		if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, data)
 	}
-	c.JSON(http.StatusOK, data)
-	}
-	
-
 }
