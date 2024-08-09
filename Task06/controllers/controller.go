@@ -125,8 +125,8 @@ func (u *Uc)RemoveUser(c *gin.Context){
 }
 func (u *Uc)GetAllUser(c *gin.Context){
 	store := u.DbStorage
-	service := u.service.GetAllUser(store)
-	c.JSON(http.StatusOK, service)
+	users := u.service.GetAllUser(store)
+	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 func (u *Uc)MakeAdmin(c *gin.Context){
 	id := c.Param("id")
