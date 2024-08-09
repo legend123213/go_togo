@@ -18,7 +18,7 @@ func Api(dbmongo *mongo.Database) *gin.Engine{
 	server.POST("api/v1/login",userController.LogUser)
 	server.POST("api/v1/signup",userController.CreateUser)
 	server.Use(middleware.AuthMiddleware())
-
+	server.PUT("api/v1/user/:id",userController.UpdateUser)
 	server.GET("api/v1/task/:id",taskController.GetTask)
 	server.GET("api/v1/tasks",taskController.GetAllTask)
 	server.GET("api/v1/user/:id",userController.GetUser)
