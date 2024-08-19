@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -94,12 +95,10 @@ func (u *UserServiceRepo) EditUser(id string, user *domain.User) (*domain.User, 
 			"username": user.Username,
 		},
 	}
-	check, err := u.Database_mongo.UpdateOne(context.TODO(), bson.M{"_id": ID}, update)
-	user.ID = ID
-	if check.MatchedCount == 0 {
-		return user, errors.New("")
+	if err := u.Database_mongo.FindOneAndUpdate(context.TODO(), bson.M{"_id": ID}, update,options.FindOneAndUpdate().SetReturnDocument(1)).Decode(&user); err!=nil{
+		return user,errors.New("asdklfjasdlkf")
 	}
-	return user, err
+	return user, nil
 }
 
 // GetUser retrieves a user by ID.
