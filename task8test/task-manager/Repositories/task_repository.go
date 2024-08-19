@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	domain "github.com/legend123213/go_togo/Task08/task-manager/Domain"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -31,10 +30,10 @@ type Collectioninter interface{
 }
 
 type TaskServiceRepo struct{
-	Database_mongo Collectioninter
+	Database_mongo *mongo.Collection
 }
 
-func NewTaskService(Db Collectioninter) *TaskServiceRepo{
+func NewTaskService(Db *mongo.Collection) *TaskServiceRepo{
 	return &TaskServiceRepo{
 		Database_mongo : Db,
 	}
@@ -56,7 +55,7 @@ func  (this *TaskServiceRepo)SGetTask(id string,user_id string) (*domain.Task, e
 	if user_id!=""{
 		serachIndex =bson.M{"_id": ID,"user_id":user_id}
 	}
-	err := this.Database_mongo.FindOne(context.TODO(),serachIndex ).Decode(&task)
+	err := this.Database_mongo.FindOne(context.TODO(),serachIndex).Decode(&task)
 	return &task, err
 }
 
@@ -101,10 +100,9 @@ func  (this *TaskServiceRepo)SEditTask(id string, t *domain.Task) (*domain.Task,
 			"status":      t.Status,
 		},
 	}
-	check, err := this.Database_mongo.UpdateOne(context.TODO(), bson.M{"_id": ID}, update)
-	t.ID = ID
-	if check.MatchedCount==0{
+	if err := this.Database_mongo.FindOneAndUpdate(context.TODO(), bson.M{"_id": ID}, update,options.FindOneAndUpdate().SetReturnDocument(1)).Decode(&t); err!=nil{
 		return t,errors.New("")
 	}
-	return t, err
+	
+	return t, nil
 }
